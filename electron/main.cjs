@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
 const fs = require("fs/promises");
@@ -16,12 +17,13 @@ function createWindow() {
     },
   });
 
-  // Carrega a aplicação Vite
+  // Em desenvolvimento, carrega o servidor de desenvolvimento
   if (process.env.NODE_ENV === "development") {
     win.loadURL("http://localhost:5173");
     win.webContents.openDevTools();
   } else {
-    win.loadFile(path.join(__dirname, "../dist/index.html"));
+    // Em produção, carrega o arquivo HTML construído
+    win.loadFile(path.join(__dirname, "dist/index.html"));
   }
 }
 

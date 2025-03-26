@@ -5,8 +5,9 @@ export class Book {
     author,
     totalPages,
     currentPage = 0,
-    lastRead = Date.now(),
+    lastRead = new Date().toISOString(),
     filePath,
+    thumbnail = null,
   }) {
     this.id = id;
     this.title = title;
@@ -15,6 +16,7 @@ export class Book {
     this.currentPage = currentPage;
     this.lastRead = lastRead;
     this.filePath = filePath;
+    this.thumbnail = thumbnail;
   }
 
   toJSON() {
@@ -26,6 +28,7 @@ export class Book {
       currentPage: this.currentPage,
       lastRead: this.lastRead,
       filePath: this.filePath,
+      thumbnail: this.thumbnail,
     };
   }
 

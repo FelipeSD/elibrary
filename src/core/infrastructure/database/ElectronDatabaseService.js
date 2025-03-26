@@ -1,29 +1,24 @@
-import sqlite3 from "sqlite3";
-import { open } from "sqlite";
+import Database from "better-sqlite3";
 import path from "path";
 import { app } from "electron";
 
-export class SQLiteService {
+export class ElectronDatabaseService {
   constructor() {
     this.dbPath = path.join(app.getPath("userData"), "books.db");
     this.db = null;
   }
 
-  async connect() {
+  connect() {
     if (this.db) return this.db;
 
-    this.db = await open({
-      filename: this.dbPath,
-      driver: sqlite3.Database,
-    });
-
-    await this.createTables();
+    this.db = new Database(this.dbPath);
+    this.createTables();
     return this.db;
   }
 
-  async createTables() {
-    const db = await this.connect();
-    await db.exec(`
+  createTables() {
+    const db = this.connect();
+    db.exec(`
       CREATE TABLE IF NOT EXISTS books (
         id TEXT PRIMARY KEY,
         title TEXT NOT NULL,
@@ -31,14 +26,15 @@ export class SQLiteService {
         totalPages INTEGER,
         currentPage INTEGER DEFAULT 0,
         lastRead INTEGER,
-        filePath TEXT NOT NULL
+        filePath TEXT NOT NULL,
+        thumbnail TEXT
       )
     `);
   }
 
-  async close() {
+  close() {
     if (this.db) {
-      await this.db.close();
+      this.db.close();
       this.db = null;
     }
   }

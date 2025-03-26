@@ -1,13 +1,26 @@
 import { IBookRepository } from "../../domain/repositories/IBookRepository";
 import { Book } from "../../domain/entities/Book";
-import { ThumbnailService } from "../../../services/thumbnailService";
 import { SupabaseDatabaseService } from "../database/SupabaseDatabaseService";
+import { ThumbnailService } from "../../../services/thumbnailService";
 
-export class ElectronBookRepository extends IBookRepository {
+export class SupabaseBookRepository extends IBookRepository {
   constructor() {
     super();
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_KEY;
+
+    console.log("Environment variables:", {
+      SUPABASE_URL: supabaseUrl,
+      SUPABASE_KEY: supabaseKey ? "***" : undefined,
+      NODE_ENV: process.env.NODE_ENV,
+    });
+
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error(
+        "Supabase credentials not found in environment variables"
+      );
+    }
+
     this.db = new SupabaseDatabaseService(supabaseUrl, supabaseKey);
   }
 

@@ -2,6 +2,11 @@ import vue from "@vitejs/plugin-vue";
 import path from "path";
 import { defineConfig } from "vite";
 import electron from "vite-plugin-electron";
+import { resolve } from 'path';
+import dotenv from 'dotenv';
+
+// Carrega as variáveis de ambiente do arquivo .env
+dotenv.config();
 
 export default defineConfig({
   plugins: [
@@ -31,5 +36,6 @@ export default defineConfig({
   },
   define: {
     "process.env.NODE_ENV": '"development"',
+    'process.env': process.env,
   },
 });

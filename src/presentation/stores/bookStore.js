@@ -2,9 +2,10 @@ import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { AddBookUseCase } from "../../core/useCases/book/AddBookUseCase";
 import { WebBookRepository } from "../../core/infrastructure/repositories/WebBookRepository";
-import { ElectronBookRepository } from "../../core/infrastructure/repositories/ElectronBookRepository";
-import { pdfService } from "../../services/pdfService";
+import { PDFService } from "../../services/pdfService";
 import { isElectron } from "../../utils/environment";
+import { ElectronBookRepository } from "../../core/infrastructure/repositories/ElectronBookRepository";
+
 export const useBookStore = defineStore("books", () => {
   const books = ref([]);
   const currentBook = ref(null);
@@ -39,10 +40,10 @@ export const useBookStore = defineStore("books", () => {
       loading.value = true;
       error.value = null;
 
-      const filePath = await pdfService.selectPDF();
+      const filePath = await PDFService.selectPDF();
       if (!filePath) return;
 
-      const pdfInfo = await pdfService.getPDFInfo(filePath);
+      const pdfInfo = await PDFService.getPDFInfo(filePath);
       const book = await addBookUseCase.execute(pdfInfo);
 
       books.value.push(book);
