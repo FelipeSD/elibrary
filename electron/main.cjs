@@ -1,22 +1,18 @@
-import { app, BrowserWindow, ipcMain, dialog } from "electron";
-import path from "path";
-import { fileURLToPath } from "url";
-import { createRequire } from "module";
-import fs from "fs/promises";
-import { PDFDocument } from "pdf-lib";
-
-const require = createRequire(import.meta.url);
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const { app, BrowserWindow, ipcMain, dialog } = require("electron");
+const path = require("path");
+const fs = require("fs/promises");
+const { PDFDocument } = require("pdf-lib");
 
 function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      preload: path.join(__dirname, "preload.cjs"),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: true,
+      sandbox: false,
+      webSecurity: true,
     },
   });
 
@@ -97,6 +93,32 @@ ipcMain.handle("pdf:get-progress", async (event, filePath) => {
   } catch (error) {
     console.error("Error reading progress:", error);
     return 0;
+  }
+});
+
+// Novos handlers para gerenciar os livros
+ipcMain.handle("books:get", async () => {
+  try {
+    const booksPath = path.join(app.getPath("userData"), "books.json");
+    try {
+      const data = await fs.readFile(booksPath, "utf-8");
+      return JSON.parse(data);
+    } catch (error) {
+      return [];
+    }
+  } catch (error) {
+    console.error("Error getting books:", error);
+    return [];
+  }
+});
+
+ipcMain.handle("books:save", async (event, books) => {
+  try {
+    const booksPath = path.join(app.getPath("userData"), "books.json");
+    await fs.writeFile(booksPath, JSON.stringify(books, null, 2));
+  } catch (error) {
+    console.error("Error saving books:", error);
+    throw error;
   }
 });
 

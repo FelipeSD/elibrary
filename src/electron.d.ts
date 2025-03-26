@@ -9,5 +9,7 @@ interface Window {
       currentPage: number;
     }) => Promise<void>;
     getProgress: (filePath: string) => Promise<number>;
+    getBooks: () => Promise<any[]>;
+    saveBooks: (books: any[]) => Promise<void>;
   };
 }

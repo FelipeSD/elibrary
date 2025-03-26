@@ -54,11 +54,14 @@
 </template>
 
 <script setup>
-import { useBookStore } from "./stores/bookStore";
+import { useBookStore } from './stores/bookStore'
+import { storeToRefs } from 'pinia'
 
-const store = useBookStore();
-const { books, loading, error, sortedBooks, addBook, openBook, removeBook } =
-  store;
+const store = useBookStore()
+const { addBook, openBook, removeBook } = store
+
+// Usar storeToRefs para propriedades reativas
+const { books, loading, error, sortedBooks } = storeToRefs(store)
 </script>
 
 <style>

@@ -2,7 +2,7 @@
   "name": "book-reader",
   "private": true,
   "version": "0.0.1",
-  "main": "electron/main.js",
+  "main": "electron/main.cjs",
   "type": "module",
   "scripts": {
     "dev": "vite",
