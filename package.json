@@ -12,13 +12,15 @@
     "electron:build": "vite build && electron-builder"
   },
   "dependencies": {
-    "vue": "^3.4.15",
-    "primevue": "^3.50.0",
-    "primeicons": "^6.0.1",
-    "primeflex": "^3.3.1",
-    "tailwindcss": "^3.4.1",
+    "autoprefixer": "^10.4.17",
+    "pdf-lib": "^1.17.1",
+    "pinia": "^3.0.1",
     "postcss": "^8.4.35",
-    "autoprefixer": "^10.4.17"
+    "primeflex": "^3.3.1",
+    "primeicons": "^6.0.1",
+    "primevue": "^3.50.0",
+    "tailwindcss": "^3.4.1",
+    "vue": "^3.4.15"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.3",

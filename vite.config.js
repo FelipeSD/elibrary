@@ -1,7 +1,7 @@
 import vue from "@vitejs/plugin-vue";
 import path from "path";
 import { defineConfig } from "vite";
-import electron from 'vite-plugin-electron';
+import electron from "vite-plugin-electron";
 
 export default defineConfig({
   plugins: [
@@ -25,5 +25,11 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     host: true,
+  },
+  optimizeDeps: {
+    exclude: ["@electron/remote"],
+  },
+  define: {
+    "process.env.NODE_ENV": '"development"',
   },
 });

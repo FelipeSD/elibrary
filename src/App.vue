@@ -3,9 +3,13 @@
     <div class="container mx-auto px-4 py-8">
       <h1 class="text-3xl font-bold text-gray-800 mb-8">Book Reader</h1>
 
+      <div v-if="error" class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+        {{ error }}
+      </div>
+
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
-          v-for="book in books"
+          v-for="book in sortedBooks"
           :key="book.id"
           class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
         >
@@ -17,7 +21,21 @@
             <span class="text-sm text-gray-500"
               >Page {{ book.currentPage }} of {{ book.totalPages }}</span
             >
-            <Button @click="openBook(book)" label="Open" icon="pi pi-book" />
+            <div class="flex gap-2">
+              <Button
+                @click="openBook(book)"
+                label="Open"
+                icon="pi pi-book"
+                :loading="loading"
+              />
+              <Button
+                @click="removeBook(book.id)"
+                label="Remove"
+                icon="pi pi-trash"
+                severity="danger"
+                text
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -28,6 +46,7 @@
           label="Add New Book"
           icon="pi pi-plus"
           class="p-button-primary"
+          :loading="loading"
         />
       </div>
     </div>
@@ -35,18 +54,11 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import Button from "primevue/button";
+import { useBookStore } from "./stores/bookStore";
 
-const books = ref([]);
-
-const addBook = () => {
-  // TODO: Implement book addition
-};
-
-const openBook = (book) => {
-  // TODO: Implement book opening
-};
+const store = useBookStore();
+const { books, loading, error, sortedBooks, addBook, openBook, removeBook } =
+  store;
 </script>
 
 <style>
@@ -60,5 +72,7 @@ const openBook = (book) => {
 @import "./assets/main.css";
 
 /* Custom styles */
-
+.p-button {
+  @apply !important;
+}
 </style>
