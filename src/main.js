@@ -20,8 +20,8 @@ const pinia = createPinia();
 app.component("Button", Button);
 
 // Use plugins
-app.use(pinia);
 app.use(PrimeVue);
+app.use(pinia);
 
 // Mount the app
 app.mount("#app");

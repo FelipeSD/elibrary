@@ -24,7 +24,7 @@ export class ElectronDatabaseService {
         title TEXT NOT NULL,
         author TEXT,
         totalPages INTEGER,
-        currentPage INTEGER DEFAULT 0,
+        currentPage INTEGER DEFAULT 1,
         lastRead INTEGER,
         filePath TEXT NOT NULL,
         thumbnail TEXT

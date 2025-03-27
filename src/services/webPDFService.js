@@ -1,4 +1,6 @@
-export class WebPDFService {
+import { IPDFService } from "./IPDFService";
+
+export class WebPDFService extends IPDFService {
   static async selectPDF() {
     console.log("Selecting PDF in Web...");
     return new Promise((resolve) => {

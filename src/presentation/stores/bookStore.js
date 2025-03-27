@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
 import { ref, computed, onMounted } from "vue";
 import { AddBookUseCase } from "../../core/useCases/book/AddBookUseCase";
-import { ElectronPDFService } from "../../services/pdfService";
 import { SupabaseBookRepository } from "../../core/infrastructure/repositories/SupabaseBookRepository";
+import { PDFService } from "../../services/pdfService";
 
 export const useBookStore = defineStore("books", () => {
   const books = ref([]);
@@ -38,14 +38,13 @@ export const useBookStore = defineStore("books", () => {
       loading.value = true;
       error.value = null;
 
-      const filePath = await ElectronPDFService.selectPDF();
+      const filePath = await PDFService.selectPDF();
       if (!filePath) return;
 
-      const pdfInfo = await ElectronPDFService.getPDFInfo(filePath);
+      const pdfInfo = await PDFService.getPDFInfo(filePath);
       const book = await addBookUseCase.execute(pdfInfo);
       console.log(book);
       books.value.push(book);
-      // await repository.saveAll(books.value);
       await repository.save(book);
     } catch (err) {
       console.error(err);
@@ -70,6 +69,7 @@ export const useBookStore = defineStore("books", () => {
 
   async function closePDFViewer() {
     showPDFViewer.value = false;
+    currentBook.value = null;
   }
 
   async function updateReadingProgress(book, currentPage) {

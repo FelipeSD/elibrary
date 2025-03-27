@@ -15,7 +15,7 @@ export class AddBookUseCase {
       title: pdfInfo.title,
       author: pdfInfo.author,
       totalPages: pdfInfo.totalPages,
-      currentPage: 0,
+      currentPage: 1,
       lastRead: new Date().toISOString(),
       filePath: pdfInfo.filePath,
     });

@@ -1,10 +1,11 @@
 <template>
   <Dialog
     v-model:visible="visible"
-    :modal="true"
     :style="{ width: '100vw', height: '100vh' }"
     :closable="true"
     class="pdf-viewer-dialog"
+    maximizable
+    modal
   >
     <template #header>
       <div class="flex justify-between items-center w-full">
@@ -19,13 +20,9 @@
 
     <div class="pdf-container">
       <VuePdfEmbed
-        v-if="pdfUrl"
-        :source="doc"
+        v-if="pdfSource"
+        :source="pdfSource"
         :page="currentPage"
-        @num-pages="onNumPages"
-        @page-loaded="onPageLoaded"
-        @loaded="onLoaded"
-        @error="onError"
         class="w-full h-full"
       >
         <template #loading>
@@ -52,15 +49,12 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update:modelValue", "progress-saved"]);
+const emit = defineEmits(["update:modelValue"]);
 
 const visible = ref(props.modelValue);
-const currentPage = ref(1);
-const totalPages = ref(0);
-const saving = ref(false);
-const pdfUrl = ref("");
-
-const { doc } = useVuePdfEmbed({ source: props.book.filePath });
+const currentPage = ref(props.book.currentPage);
+const totalPages = ref(props.book.totalPages);
+const pdfSource = ref(props.book.filePath);
 
 // Synchronize v-model
 watch(
@@ -76,61 +70,6 @@ watch(
     emit("update:modelValue", newValue);
   }
 );
-
-// Load PDF on mount
-onMounted(async () => {
-  try {
-    // Set PDF URL (replace with your method of obtaining PDF)
-    pdfUrl.value = props.book.filePath;
-  } catch (error) {
-    console.error("Error loading PDF:", error);
-  }
-});
-
-// PDF Event Handlers
-const onNumPages = (numPages) => {
-  totalPages.value = numPages;
-};
-
-const onPageLoaded = (page) => {
-  currentPage.value = page;
-};
-
-// Page Navigation
-const goToPage = (page) => {
-  currentPage.value = page;
-};
-
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++;
-  }
-};
-
-const previousPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--;
-  }
-};
-
-// Save Progress (optional)
-const saveProgress = async () => {
-  try {
-    saving.value = true;
-    // Implement your progress saving logic here
-    emit("progress-saved", currentPage.value);
-  } catch (error) {
-    console.error("Error saving progress:", error);
-  } finally {
-    saving.value = false;
-  }
-};
-
-// Close Modal
-const close = () => {
-  visible.value = false;
-  saveProgress();
-};
 </script>
 
 <style scoped>

@@ -4,7 +4,7 @@ export class Book {
     title,
     author,
     totalPages,
-    currentPage = 0,
+    currentPage = 1,
     lastRead = new Date().toISOString(),
     filePath,
     thumbnail = null,

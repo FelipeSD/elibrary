@@ -1,16 +1,16 @@
 import vue from "@vitejs/plugin-vue";
+import dotenv from "dotenv";
 import path from "path";
 import { defineConfig } from "vite";
 import electron from "vite-plugin-electron";
-import { resolve } from 'path';
-import dotenv from 'dotenv';
+import vueDevTools from "vite-plugin-vue-devtools";
 
-// Carrega as variáveis de ambiente do arquivo .env
 dotenv.config();
 
 export default defineConfig({
   plugins: [
     vue(),
+    vueDevTools(),
     electron({
       entry: "electron/main.cjs",
     }),
@@ -36,6 +36,6 @@ export default defineConfig({
   },
   define: {
     "process.env.NODE_ENV": '"development"',
-    'process.env': process.env,
+    "process.env": process.env,
   },
 });
