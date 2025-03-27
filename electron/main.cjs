@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
 const fs = require("fs/promises");
@@ -14,6 +14,7 @@ function createWindow() {
       nodeIntegration: false,
       sandbox: false,
       webSecurity: true,
+      webviewTag: true,
     },
   });
 
@@ -120,6 +121,17 @@ ipcMain.handle("books:save", async (event, books) => {
     await fs.writeFile(booksPath, JSON.stringify(books, null, 2));
   } catch (error) {
     console.error("Error saving books:", error);
+    throw error;
+  }
+});
+
+// Handler para servir arquivos PDF
+ipcMain.handle("pdf:serve", async (event, filePath) => {
+  try {
+    const pdfBytes = await fs.readFile(filePath);
+    return pdfBytes;
+  } catch (error) {
+    console.error("Error serving PDF:", error);
     throw error;
   }
 });

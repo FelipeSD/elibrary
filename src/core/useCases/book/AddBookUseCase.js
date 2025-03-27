@@ -11,7 +11,7 @@ export class AddBookUseCase {
 
   async execute(pdfInfo) {
     const book = new Book({
-      id: crypto.randomUUID(),
+      // id: crypto.randomUUID(),
       title: pdfInfo.title,
       author: pdfInfo.author,
       totalPages: pdfInfo.totalPages,

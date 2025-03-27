@@ -39,9 +39,7 @@ export class ThumbnailService {
   static async getThumbnail(filePath) {
     try {
       if (isElectron()) {
-        // No Electron, leia o arquivo diretamente
-        const fs = require("fs/promises");
-        const pdfBytes = await fs.readFile(filePath);
+        const pdfBytes = await window.electronAPI.readFile(filePath);
         return await this.generateThumbnail(pdfBytes);
       } else {
         // Na web, faça o fetch do arquivo

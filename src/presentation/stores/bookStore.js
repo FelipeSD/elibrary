@@ -1,20 +1,18 @@
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { AddBookUseCase } from "../../core/useCases/book/AddBookUseCase";
-import { WebBookRepository } from "../../core/infrastructure/repositories/WebBookRepository";
-import { PDFService } from "../../services/pdfService";
-import { isElectron } from "../../utils/environment";
-import { ElectronBookRepository } from "../../core/infrastructure/repositories/ElectronBookRepository";
+import { ElectronPDFService } from "../../services/pdfService";
+import { SupabaseBookRepository } from "../../core/infrastructure/repositories/SupabaseBookRepository";
 
 export const useBookStore = defineStore("books", () => {
   const books = ref([]);
   const currentBook = ref(null);
   const loading = ref(false);
   const error = ref(null);
+  const showPDFViewer = ref(false);
 
-  const repository = isElectron()
-    ? new ElectronBookRepository()
-    : new WebBookRepository();
+  const repository = new SupabaseBookRepository();
+
   const addBookUseCase = new AddBookUseCase(repository);
 
   const sortedBooks = computed(() => {
@@ -40,15 +38,17 @@ export const useBookStore = defineStore("books", () => {
       loading.value = true;
       error.value = null;
 
-      const filePath = await PDFService.selectPDF();
+      const filePath = await ElectronPDFService.selectPDF();
       if (!filePath) return;
 
-      const pdfInfo = await PDFService.getPDFInfo(filePath);
+      const pdfInfo = await ElectronPDFService.getPDFInfo(filePath);
       const book = await addBookUseCase.execute(pdfInfo);
-
+      console.log(book);
       books.value.push(book);
-      await repository.saveAll(books.value);
+      // await repository.saveAll(books.value);
+      await repository.save(book);
     } catch (err) {
+      console.error(err);
       error.value = err.message;
     } finally {
       loading.value = false;
@@ -60,11 +60,16 @@ export const useBookStore = defineStore("books", () => {
       loading.value = true;
       error.value = null;
       currentBook.value = book;
+      showPDFViewer.value = true;
     } catch (err) {
       error.value = err.message;
     } finally {
       loading.value = false;
     }
+  }
+
+  async function closePDFViewer() {
+    showPDFViewer.value = false;
   }
 
   async function updateReadingProgress(book, currentPage) {
@@ -99,15 +104,21 @@ export const useBookStore = defineStore("books", () => {
     }
   }
 
+  onMounted(async () => {
+    await loadBooks();
+  });
+
   return {
     books,
     currentBook,
     loading,
     error,
     sortedBooks,
+    showPDFViewer,
     loadBooks,
     addBook,
     openBook,
+    closePDFViewer,
     updateReadingProgress,
     removeBook,
   };

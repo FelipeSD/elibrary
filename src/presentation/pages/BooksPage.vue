@@ -60,15 +60,30 @@
         :loading="loading"
       />
     </div>
+
+    <PDFViewer
+      v-if="currentBook"
+      v-model="showPDFViewer"
+      :book="currentBook"
+      @progress-saved="onProgressSaved"
+    />
   </div>
 </template>
 
 <script setup>
 import { useBookStore } from "../stores/bookStore";
 import { storeToRefs } from "pinia";
+import PDFViewer from "../components/PDFViewer.vue";
 
 const store = useBookStore();
-const { addBook, openBook, removeBook } = store;
+const { addBook, openBook, removeBook, updateReadingProgress } = store;
 
-const { loading, error, sortedBooks } = storeToRefs(store);
+const { loading, error, sortedBooks, showPDFViewer, currentBook } =
+  storeToRefs(store);
+
+async function onProgressSaved(currentPage) {
+  if (currentBook.value) {
+    await updateReadingProgress(currentBook.value, currentPage);
+  }
+}
 </script>
