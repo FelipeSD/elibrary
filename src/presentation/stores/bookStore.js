@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from "vue";
 import { AddBookUseCase } from "../../core/useCases/book/AddBookUseCase";
 import { SupabaseBookRepository } from "../../core/infrastructure/repositories/SupabaseBookRepository";
 import { PDFService } from "../../services/pdfService";
+import { SupabaseStorageService } from "../../core/infrastructure/storage/SupabaseStorageService";
 
 export const useBookStore = defineStore("books", () => {
   const books = ref([]);
@@ -12,6 +13,7 @@ export const useBookStore = defineStore("books", () => {
   const showPDFViewer = ref(false);
 
   const repository = new SupabaseBookRepository();
+  const storage = new SupabaseStorageService();
 
   const addBookUseCase = new AddBookUseCase(repository);
 
@@ -94,9 +96,11 @@ export const useBookStore = defineStore("books", () => {
       loading.value = true;
       error.value = null;
 
-      books.value = books.value.filter((book) => book.id !== bookId);
+      // books.value = books.value.filter((book) => book.id !== bookId);
+      const book = books.value.find((book) => book.id === bookId);
+      await storage.deletePDF(book.filePath)
       await repository.delete(bookId);
-      await repository.saveAll(books.value);
+      // await repository.saveAll(books.value);
     } catch (err) {
       error.value = err.message;
     } finally {

@@ -1,3 +1,4 @@
+import { SupabaseStorageService } from "../core/infrastructure/storage/SupabaseStorageService";
 import { IPDFService } from "./IPDFService";
 
 export class WebPDFService extends IPDFService {
@@ -7,12 +8,15 @@ export class WebPDFService extends IPDFService {
       const input = document.createElement("input");
       input.type = "file";
       input.accept = ".pdf";
-      input.onchange = (e) => {
+      input.onchange = async (e) => {
         const file = e.target.files[0];
+        const storageService = new SupabaseStorageService();
         console.log("File selected:", file);
-        if (file) {
-          const fileUrl = URL.createObjectURL(file);
-          console.log("Created file URL:", fileUrl);
+        const filePath = await storageService.uploadPDF(file);
+        console.log("File path:", filePath);
+        if (filePath) {
+          const fileUrl = await storageService.getPDFUrl(filePath);
+          console.log("PDF Uploaded! URL:", fileUrl);
           resolve(fileUrl);
         } else {
           resolve(null);
