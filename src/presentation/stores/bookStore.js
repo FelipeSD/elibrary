@@ -40,14 +40,13 @@ export const useBookStore = defineStore("books", () => {
       loading.value = true;
       error.value = null;
 
-      const filePath = await PDFService.selectPDF();
-      if (!filePath) return;
-
-      const pdfInfo = await PDFService.getPDFInfo(filePath);
-      const book = await addBookUseCase.execute(pdfInfo);
+      const book = await PDFService.selectPDF();
       console.log(book);
+      if(!book) {
+        throw new Error("Error adding book")
+      }
+      await addBookUseCase.execute(book);
       books.value.push(book);
-      await repository.save(book);
     } catch (err) {
       console.error(err);
       error.value = err.message;
@@ -96,11 +95,10 @@ export const useBookStore = defineStore("books", () => {
       loading.value = true;
       error.value = null;
 
-      // books.value = books.value.filter((book) => book.id !== bookId);
       const book = books.value.find((book) => book.id === bookId);
-      await storage.deletePDF(book.filePath)
+      await storage.deletePDF(book.fileName)
       await repository.delete(bookId);
-      // await repository.saveAll(books.value);
+      books.value = books.value.filter((book) => book.id !== bookId);
     } catch (err) {
       error.value = err.message;
     } finally {

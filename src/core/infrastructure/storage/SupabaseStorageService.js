@@ -9,6 +9,7 @@ function sanitizeFileName(fileName) {
     .toLowerCase();
 }
 
+const BUCKET = "pdfs"
 export class SupabaseStorageService {
   constructor() {
     const supabaseUrl = process.env.SUPABASE_URL;
@@ -19,7 +20,7 @@ export class SupabaseStorageService {
   async uploadPDF(file) {
     const fileName = `${Date.now()}-${sanitizeFileName(file.name)}`;
     const { data, error } = await this.supabase.storage
-      .from("pdfs")
+      .from(BUCKET)
       .upload(fileName, file, { contentType: "application/pdf" });
 
     console.log("Data:", data);
@@ -34,15 +35,15 @@ export class SupabaseStorageService {
   }
 
   async getPDFUrl(filePath) {
-    const { data } = this.supabase.storage.from("pdfs").getPublicUrl(filePath);
+    const { data } = this.supabase.storage.from(BUCKET).getPublicUrl(filePath);
     console.log(data);
     return data.publicUrl;
   }
 
-  async deletePDF(filePath) {
+  async deletePDF(fileName) {
     const { error } = await this.supabase.storage
-      .from("pdfs")
-      .remove([filePath]);
+      .from(BUCKET)
+      .remove([fileName]);
 
     if (error) {
       console.error("Erro ao deletar PDF:", error.message);

@@ -1,3 +1,5 @@
+import { PDFDocument } from "pdf-lib";
+import { Book } from "../core/domain/entities/Book";
 import { SupabaseStorageService } from "../core/infrastructure/storage/SupabaseStorageService";
 import { IPDFService } from "./IPDFService";
 
@@ -17,7 +19,18 @@ export class WebPDFService extends IPDFService {
         if (filePath) {
           const fileUrl = await storageService.getPDFUrl(filePath);
           console.log("PDF Uploaded! URL:", fileUrl);
-          resolve(fileUrl);
+          const pdfInfo = await this.getPDFInfo(fileUrl);
+
+          resolve(
+            new Book({
+              author: pdfInfo.author,
+              totalPages: pdfInfo.totalPages,
+              filePath: fileUrl,
+              fileName: pdfInfo.title,
+              title: file.name,
+              currentPage: 1,
+            })
+          );
         } else {
           resolve(null);
         }
@@ -31,11 +44,10 @@ export class WebPDFService extends IPDFService {
       console.log("Getting PDF info for:", filePath);
       const response = await fetch(filePath);
       const arrayBuffer = await response.arrayBuffer();
-      const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
 
       const info = {
-        title:
-          pdfDoc.getTitle() || filePath.split("/").pop().replace(".pdf", ""),
+        title: filePath.split("/").pop(),
         author: pdfDoc.getAuthor() || "Unknown",
         totalPages: pdfDoc.getPageCount(),
         filePath,

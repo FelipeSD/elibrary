@@ -78,6 +78,7 @@ export class SupabaseBookRepository extends IBookRepository {
       currentPage: dbData.current_page,
       lastRead: dbData.last_read,
       filePath: dbData.file_path,
+      fileName: dbData.file_name,
       thumbnail: dbData.thumbnail,
     };
   }
@@ -92,6 +93,7 @@ export class SupabaseBookRepository extends IBookRepository {
       current_page: entityData.currentPage,
       last_read: entityData.lastRead,
       file_path: entityData.filePath,
+      file_name: entityData.fileName,
       thumbnail: entityData.thumbnail,
     };
   }

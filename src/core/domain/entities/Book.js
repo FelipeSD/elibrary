@@ -7,6 +7,7 @@ export class Book {
     currentPage = 1,
     lastRead = new Date().toISOString(),
     filePath,
+    fileName,
     thumbnail = null,
   }) {
     this.id = id;
@@ -16,6 +17,7 @@ export class Book {
     this.currentPage = currentPage;
     this.lastRead = lastRead;
     this.filePath = filePath;
+    this.fileName = fileName;
     this.thumbnail = thumbnail;
   }
 
@@ -28,6 +30,7 @@ export class Book {
       currentPage: this.currentPage,
       lastRead: this.lastRead,
       filePath: this.filePath,
+      fileName: this.fileName,
       thumbnail: this.thumbnail,
     };
   }
