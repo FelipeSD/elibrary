@@ -18,6 +18,7 @@ export class AddBookUseCase {
       currentPage: 1,
       lastRead: new Date().toISOString(),
       filePath: pdfInfo.filePath,
+      fileName: pdfInfo.fileName,
     });
 
     return await this.bookRepository.save(book);

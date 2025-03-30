@@ -65,7 +65,7 @@
       v-if="currentBook"
       v-model="showPDFViewer"
       :book="currentBook"
-      @progress-saved="onProgressSaved"
+      @onPageChange="onProgressSaved"
     />
   </div>
 </template>

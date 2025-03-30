@@ -1,45 +1,74 @@
 <template>
   <Dialog
     v-model:visible="visible"
-    :style="{ width: '100vw', height: '100vh' }"
     :closable="true"
+    :showHeader="false"
+    :pt="{
+      root: 'p-dialog-maximized',
+    }"
     class="pdf-viewer-dialog"
     maximizable
     modal
   >
-    <template #header>
-      <div class="flex justify-between items-center w-full">
-        <h2 class="text-xl font-bold">{{ book.title }}</h2>
-        <div class="flex items-center gap-2">
-          <span class="text-sm">
+    <div class="pdf-container">
+      <div class="absolute p-2 right-0 z-10">
+        <Button
+          @click="$emit('update:modelValue', false)"
+          icon="pi pi-times"
+          text
+          rounded
+          severity="contrast"
+          size="small"
+        />
+      </div>
+      <div
+        class="flex w-full h-full flex-col items-center justify-center relative"
+      >
+        <div v-if="loadingProgress < 100">
+          <Knob
+            v-model="loadingProgress"
+            :size="150"
+            valueTemplate="{value}%"
+            readonly
+          />
+        </div>
+
+        <VuePdfEmbed
+          v-if="pdfSource"
+          :source="pdfSource"
+          :page="currentPage"
+          :width="500"
+          @progress="onLoadingProgress"
+        />
+
+        <div
+          class="absolute bottom-0 flex w-full items-center justify-center mt-4 gap-4"
+          v-if="loadingProgress === 100"
+        >
+          <Slider
+            v-if="totalPages"
+            v-model="currentPage"
+            :min="1"
+            :max="totalPages"
+            :step="1"
+            class="w-1/2 mt-4"
+          />
+          <div class="ml-2 mt-4 text-sm text-gray-500">
             Page {{ currentPage }} of {{ totalPages }}
-          </span>
+          </div>
         </div>
       </div>
-    </template>
-
-    <div class="pdf-container">
-      <VuePdfEmbed
-        v-if="pdfSource"
-        :source="pdfSource"
-        :page="currentPage"
-        class="w-full h-full"
-      >
-        <template #loading>
-          <div class="flex items-center justify-center h-full">
-            <ProgressSpinner />
-          </div>
-        </template>
-      </VuePdfEmbed>
     </div>
   </Dialog>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, watch } from "vue";
 import Dialog from "primevue/dialog";
-import ProgressSpinner from "primevue/progressspinner";
 import VuePdfEmbed, { useVuePdfEmbed } from "vue-pdf-embed";
+import Slider from "primevue/slider";
+import Knob from "primevue/knob";
+import { useDebounce } from "../composables/useDebounce";
 
 const props = defineProps({
   modelValue: Boolean,
@@ -49,14 +78,16 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "onPageChange"]);
 
 const visible = ref(props.modelValue);
 const currentPage = ref(props.book.currentPage);
 const totalPages = ref(props.book.totalPages);
 const pdfSource = ref(props.book.filePath);
+const loadingProgress = ref(10);
 
-// Synchronize v-model
+const { debouncedCallback } = useDebounce();
+
 watch(
   () => props.modelValue,
   (newValue) => {
@@ -70,20 +101,31 @@ watch(
     emit("update:modelValue", newValue);
   }
 );
+
+watch(
+  () => currentPage.value,
+  (newPage) => {
+    debouncedCallback(() => {
+      emit("onPageChange", newPage);
+    }, 750);
+  }
+);
+
+const onLoadingProgress = (progress) => {
+  loadingProgress.value = Number(
+    ((progress.loaded / progress.total) * 100).toFixed(0)
+  );
+};
 </script>
 
-<style scoped>
-.pdf-viewer-dialog {
-  max-width: 100vw !important;
-  max-height: 100vh !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
+<style>
 .pdf-container {
   width: 100%;
-  height: calc(100vh - 120px);
-  overflow: hidden;
-  background-color: #f5f5f5;
+  height: 100%;
+}
+
+canvas {
+  width: 100% !important;
+  height: calc(100vh - 5rem) !important;
 }
 </style>

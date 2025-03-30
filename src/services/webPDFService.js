@@ -11,16 +11,13 @@ export class WebPDFService extends IPDFService {
       input.type = "file";
       input.accept = ".pdf";
       input.onchange = async (e) => {
-        const file = e.target.files[0];
-        const storageService = new SupabaseStorageService();
-        console.log("File selected:", file);
-        const filePath = await storageService.uploadPDF(file);
-        console.log("File path:", filePath);
-        if (filePath) {
+        console.log("File selected:", e.target.files[0]);
+        try {
+          const file = e.target.files[0];
+          const storageService = new SupabaseStorageService();
+          const filePath = await storageService.uploadPDF(file);
           const fileUrl = await storageService.getPDFUrl(filePath);
-          console.log("PDF Uploaded! URL:", fileUrl);
           const pdfInfo = await this.getPDFInfo(fileUrl);
-
           resolve(
             new Book({
               author: pdfInfo.author,
@@ -31,8 +28,9 @@ export class WebPDFService extends IPDFService {
               currentPage: 1,
             })
           );
-        } else {
-          resolve(null);
+        } catch (error) {
+          console.error("Error getting PDF info: ")
+          resolve(null)
         }
       };
       input.click();

@@ -42,11 +42,11 @@ export const useBookStore = defineStore("books", () => {
 
       const book = await PDFService.selectPDF();
       console.log(book);
-      if(!book) {
-        throw new Error("Error adding book")
+      if (!book) {
+        throw new Error("Error adding book");
       }
-      await addBookUseCase.execute(book);
-      books.value.push(book);
+      const savedBook = await addBookUseCase.execute(book);
+      books.value.push(savedBook);
     } catch (err) {
       console.error(err);
       error.value = err.message;
@@ -82,7 +82,7 @@ export const useBookStore = defineStore("books", () => {
       book.lastRead = new Date().toISOString();
 
       await repository.update(book);
-      await repository.saveAll(books.value);
+      // await repository.saveAll(books.value);
     } catch (err) {
       error.value = err.message;
     } finally {
@@ -96,7 +96,7 @@ export const useBookStore = defineStore("books", () => {
       error.value = null;
 
       const book = books.value.find((book) => book.id === bookId);
-      await storage.deletePDF(book.fileName)
+      await storage.deletePDF(book.fileName);
       await repository.delete(bookId);
       books.value = books.value.filter((book) => book.id !== bookId);
     } catch (err) {
