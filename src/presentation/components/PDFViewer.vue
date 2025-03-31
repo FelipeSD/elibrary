@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    v-model:visible="visible"
+    :visible="showPDFViewer"
     :closable="true"
     :showHeader="false"
     :pt="{
@@ -13,7 +13,7 @@
     <div class="pdf-container">
       <div class="absolute p-2 right-0 z-10">
         <Button
-          @click="$emit('update:modelValue', false)"
+          @click="closePDFViewer"
           icon="pi pi-times"
           text
           rounded
@@ -34,7 +34,6 @@
         </div>
 
         <VuePdfEmbed
-          v-if="pdfSource"
           :source="pdfSource"
           :page="currentPage"
           :width="500"
@@ -63,44 +62,25 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
 import Dialog from "primevue/dialog";
-import VuePdfEmbed, { useVuePdfEmbed } from "vue-pdf-embed";
-import Slider from "primevue/slider";
 import Knob from "primevue/knob";
+import Slider from "primevue/slider";
+import { computed, ref, watch } from "vue";
+import VuePdfEmbed from "vue-pdf-embed";
 import { useDebounce } from "../composables/useDebounce";
+import { useBookStore } from "../stores/bookStore";
 
-const props = defineProps({
-  modelValue: Boolean,
-  book: {
-    type: Object,
-    required: true,
-  },
-});
+const emit = defineEmits(["onPageChange"]);
 
-const emit = defineEmits(["update:modelValue", "onPageChange"]);
-
-const visible = ref(props.modelValue);
-const currentPage = ref(props.book.currentPage);
-const totalPages = ref(props.book.totalPages);
-const pdfSource = ref(props.book.filePath);
-const loadingProgress = ref(10);
+const store = useBookStore();
+const { closePDFViewer, showPDFViewer, currentBook } = store;
 
 const { debouncedCallback } = useDebounce();
 
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    visible.value = newValue;
-  }
-);
-
-watch(
-  () => visible.value,
-  (newValue) => {
-    emit("update:modelValue", newValue);
-  }
-);
+const currentPage = computed(() => currentBook.currentPage);
+const totalPages = computed(() => currentBook.totalPages);
+const pdfSource = computed(() => currentBook.filePath);
+const loadingProgress = ref(0);
 
 watch(
   () => currentPage.value,

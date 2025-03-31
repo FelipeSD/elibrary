@@ -2,7 +2,7 @@
   <Card
     v-tooltip.left="book.title"
     class="cursor-pointer relative"
-    @click="emit('openBook', book)"
+    @click="openBook(book)"
     :dt="{
       'body.padding': 0,
     }"
@@ -44,15 +44,20 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { ref } from "vue";
+import { useConfirm, useToast } from "primevue";
+import { computed, ref } from "vue";
+import { useBookStore } from "../stores/bookStore";
 const props = defineProps({
   book: {
     type: Object,
     required: true,
   },
 });
-const emit = defineEmits(["openBook", "removeBook"]);
+
+const confirm = useConfirm();
+const toast = useToast();
+const store = useBookStore();
+const { openBook, removeBook } = store;
 
 const bookPercentageRead = computed(() => {
   return Math.round((props.book.currentPage / props.book.totalPages) * 100);
@@ -65,9 +70,7 @@ const items = ref([
     label: "Remove",
     icon: "pi pi-trash",
     command: () => {
-      console.log("removeBook");
-
-      emit("removeBook", props.book.id);
+      remove();
     },
   },
 ]);
@@ -75,4 +78,31 @@ const items = ref([
 const toggle = (event) => {
   menu.value.toggle(event);
 };
+
+function remove() {
+  confirm.require({
+    message: `Do you want to delete ${book.title}?`,
+    header: "Danger Zone",
+    icon: "pi pi-info-circle",
+    rejectLabel: "Cancel",
+    rejectProps: {
+      label: "Cancel",
+      severity: "secondary",
+      outlined: true,
+    },
+    acceptProps: {
+      label: "Delete",
+      severity: "danger",
+    },
+    accept: async () => {
+      await removeBook(props.book.id);
+      toast.add({
+        severity: "info",
+        summary: "Confirmed",
+        detail: "Record deleted",
+        life: 3000,
+      });
+    },
+  });
+}
 </script>

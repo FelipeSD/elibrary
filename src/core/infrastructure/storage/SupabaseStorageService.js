@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import supabaseClient from "../supabaseClient";
 
 function sanitizeFileName(fileName) {
   return fileName
@@ -9,12 +9,10 @@ function sanitizeFileName(fileName) {
     .toLowerCase();
 }
 
-const BUCKET = "pdfs"
+const BUCKET = "pdfs";
 export class SupabaseStorageService {
   constructor() {
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_KEY;
-    this.supabase = createClient(supabaseUrl, supabaseKey);
+    this.supabase = supabaseClient;
   }
 
   async uploadPDF(file) {

@@ -11,7 +11,7 @@
         <Skeleton class="w-full h-56" v-if="loading" />
       </template>
       <template v-for="book in sortedBooks" :key="book.id">
-        <BookCard :book="book" @openBook="open" @removeBook="remove" />
+        <BookCard :book="book" />
       </template>
       <Card
         :pt="{
@@ -35,62 +35,25 @@
 
     <PDFViewer
       v-if="currentBook"
-      v-model="showPDFViewer"
-      :book="currentBook"
-      @onPageChange="onProgressSaved"
+      @onPageChange="saveProgress"
     />
   </div>
 </template>
 
 <script setup>
 import { storeToRefs } from "pinia";
-import { useConfirm, useToast } from "primevue";
 import BookCard from "../components/BookCard.vue";
 import PDFViewer from "../components/PDFViewer.vue";
 import { useBookStore } from "../stores/bookStore";
 
 const store = useBookStore();
-const confirm = useConfirm();
-const toast = useToast();
-const { addBook, openBook, updateReadingProgress, removeBook, getBookById } = store;
+const { addBook, updateReadingProgress } = store;
 const { loading, error, sortedBooks, showPDFViewer, currentBook } =
   storeToRefs(store);
 
-async function onProgressSaved(currentPage) {
+async function saveProgress(currentPage) {
   if (currentBook.value) {
     await updateReadingProgress(currentBook.value, currentPage);
   }
-}
-
-function open(book) {
-  openBook(book);
-}
-
-function remove(bookId) {
-  const book = getBookById(bookId)
-  confirm.require({
-    message: `Do you want to delete ${book.title}?`,
-    header: "Danger Zone",
-    icon: "pi pi-info-circle",
-    rejectLabel: "Cancel",
-    rejectProps: {
-      label: "Cancel",
-      severity: "secondary",
-      outlined: true,
-    },
-    acceptProps: {
-      label: "Delete",
-      severity: "danger",
-    },
-    accept: async () => {
-      await removeBook(bookId);
-      toast.add({
-        severity: "info",
-        summary: "Confirmed",
-        detail: "Record deleted",
-        life: 3000,
-      });
-    },
-  });
 }
 </script>

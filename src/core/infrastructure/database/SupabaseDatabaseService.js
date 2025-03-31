@@ -1,10 +1,9 @@
-import { createClient } from "@supabase/supabase-js";
 import { IDatabaseService } from "./IDatabaseService";
 
 export class SupabaseDatabaseService extends IDatabaseService {
-  constructor(supabaseUrl, supabaseKey) {
+  constructor(supabase) {
     super();
-    this.supabase = createClient(supabaseUrl, supabaseKey);
+    this.supabase = supabase;
   }
 
   async connect() {
