@@ -37,7 +37,6 @@ export const useBookStore = defineStore("books", () => {
 
   async function addBook() {
     try {
-      loading.value = true;
       error.value = null;
 
       const book = await PDFService.selectPDF();
@@ -45,6 +44,7 @@ export const useBookStore = defineStore("books", () => {
       if (!book) {
         throw new Error("Error adding book");
       }
+      loading.value = true;
       const savedBook = await addBookUseCase.execute(book);
       books.value.push(savedBook);
     } catch (err) {

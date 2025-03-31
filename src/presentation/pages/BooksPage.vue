@@ -4,51 +4,12 @@
       {{ error }}
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div
-        v-for="book in sortedBooks"
-        :key="book.id"
-        class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
-      >
-        <div class="mb-4">
-          <img
-            v-if="book.thumbnail"
-            :src="book.thumbnail"
-            :alt="book.title"
-            class="w-full h-48 object-contain bg-gray-100 rounded-lg"
-          />
-          <div
-            v-else
-            class="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center"
-          >
-            <i class="pi pi-book text-4xl text-gray-400"></i>
-          </div>
-        </div>
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">
-          {{ book.title }}
-        </h2>
-        <p class="text-gray-600 mb-4">{{ book.author }}</p>
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-gray-500"
-            >Page {{ book.currentPage }} of {{ book.totalPages }}</span
-          >
-          <div class="flex gap-2">
-            <Button
-              @click="openBook(book)"
-              label="Open"
-              icon="pi pi-book"
-              :loading="loading"
-            />
-            <Button
-              @click="removeBook(book.id)"
-              label="Remove"
-              icon="pi pi-trash"
-              severity="danger"
-              text
-            />
-          </div>
-        </div>
-      </div>
+    <div
+      class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-9 gap-6"
+    >
+      <template v-for="book in sortedBooks" :key="book.id">
+        <BookCard :book="book" @openBook="open" />
+      </template>
     </div>
 
     <div class="mt-8">
@@ -56,7 +17,7 @@
         @click="addBook"
         label="Add New Book"
         icon="pi pi-plus"
-        class="p-button-primary"
+        severity="success"
         :loading="loading"
       />
     </div>
@@ -74,6 +35,7 @@
 import { useBookStore } from "../stores/bookStore";
 import { storeToRefs } from "pinia";
 import PDFViewer from "../components/PDFViewer.vue";
+import BookCard from "../components/BookCard.vue";
 
 const store = useBookStore();
 const { addBook, openBook, removeBook, updateReadingProgress } = store;
@@ -85,5 +47,9 @@ async function onProgressSaved(currentPage) {
   if (currentBook.value) {
     await updateReadingProgress(currentBook.value, currentPage);
   }
+}
+
+function open(book) {
+  openBook(book);
 }
 </script>
