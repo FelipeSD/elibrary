@@ -1,19 +1,14 @@
+import supabaseClient from "../supabaseClient";
 import { IDatabaseService } from "./IDatabaseService";
 
 export class SupabaseDatabaseService extends IDatabaseService {
-  constructor(supabase) {
+  constructor() {
     super();
-    this.supabase = supabase;
+    this.supabase = supabaseClient;
   }
 
   async connect() {
-    // Supabase não precisa de conexão explícita
-    return this.supabase;
-  }
-
-  async createTables() {
-    // As tabelas são criadas no painel do Supabase
-    // Aqui você pode adicionar lógica de migração se necessário
+    return this.supabase; // Supabase já está conectado
   }
 
   async getAll(table) {
@@ -49,24 +44,12 @@ export class SupabaseDatabaseService extends IDatabaseService {
   }
 
   async update(table, id, data) {
-    const { data: updatedData, error } = await this.supabase
-      .from(table)
-      .update(data)
-      .eq("id", id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return updatedData;
+    return this.save(table, { ...data, id });
   }
 
   async delete(table, id) {
     const { error } = await this.supabase.from(table).delete().eq("id", id);
 
     if (error) throw error;
-  }
-
-  async close() {
-    // Supabase não precisa de fechamento explícito
   }
 }

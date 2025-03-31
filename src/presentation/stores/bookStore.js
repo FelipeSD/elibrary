@@ -9,6 +9,7 @@ export const useBookStore = defineStore("books", () => {
   const books = ref([]);
   const currentBook = ref(null);
   const loading = ref(false);
+  const loadingRemove = ref(false);
   const error = ref(null);
   const showPDFViewer = ref(false);
 
@@ -22,10 +23,6 @@ export const useBookStore = defineStore("books", () => {
       (a, b) => new Date(b.lastRead) - new Date(a.lastRead)
     );
   });
-
-  function getBookById(bookId) {
-    return books.value.find((book) => book.id === bookId);
-  }
 
   async function loadBooks() {
     try {
@@ -95,7 +92,7 @@ export const useBookStore = defineStore("books", () => {
 
   async function removeBook(bookId) {
     try {
-      loading.value = true;
+      loadingRemove.value = true;
       error.value = null;
 
       const book = books.value.find((book) => book.id === bookId);
@@ -105,7 +102,7 @@ export const useBookStore = defineStore("books", () => {
     } catch (err) {
       error.value = err.message;
     } finally {
-      loading.value = false;
+      loadingRemove.value = false;
     }
   }
 
@@ -117,6 +114,7 @@ export const useBookStore = defineStore("books", () => {
     books,
     currentBook,
     loading,
+    loadingRemove,
     error,
     sortedBooks,
     showPDFViewer,
@@ -125,7 +123,6 @@ export const useBookStore = defineStore("books", () => {
     openBook,
     closePDFViewer,
     updateReadingProgress,
-    removeBook,
-    getBookById,
+    removeBook
   };
 });

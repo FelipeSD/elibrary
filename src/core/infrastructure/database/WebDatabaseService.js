@@ -1,30 +1,30 @@
-export class WebDatabaseService {
+import { IDatabaseService } from "./IDatabaseService";
+
+export class WebDatabaseService extends IDatabaseService {
   constructor() {
-    this.storageKey = "books_db";
-    this.initStorage();
+    super();
+    this.storageKeyPrefix = "db_";
   }
 
-  initStorage() {
-    if (!localStorage.getItem(this.storageKey)) {
-      localStorage.setItem(this.storageKey, JSON.stringify([]));
-    }
+  getTableKey(table) {
+    return `${this.storageKeyPrefix}${table}`;
   }
 
   connect() {
     return this;
   }
 
-  getAll() {
-    return JSON.parse(localStorage.getItem(this.storageKey) || "[]");
+  getAll(table) {
+    return JSON.parse(localStorage.getItem(this.getTableKey(table)) || "[]");
   }
 
-  getById(id) {
-    const items = this.getAll();
-    return items.find((item) => item.id === id);
+  getById(table, id) {
+    const items = this.getAll(table);
+    return items.find((item) => item.id === id) || null;
   }
 
-  save(item) {
-    const items = this.getAll();
+  save(table, item) {
+    const items = this.getAll(table);
     const index = items.findIndex((i) => i.id === item.id);
 
     if (index === -1) {
@@ -33,14 +33,17 @@ export class WebDatabaseService {
       items[index] = item;
     }
 
-    localStorage.setItem(this.storageKey, JSON.stringify(items));
+    localStorage.setItem(this.getTableKey(table), JSON.stringify(items));
     return item;
   }
 
-  delete(id) {
-    const items = this.getAll();
-    const filteredItems = items.filter((item) => item.id !== id);
-    localStorage.setItem(this.storageKey, JSON.stringify(filteredItems));
+  update(table, id, data) {
+    return this.save(table, { ...data, id });
+  }
+
+  delete(table, id) {
+    const items = this.getAll(table).filter((item) => item.id !== id);
+    localStorage.setItem(this.getTableKey(table), JSON.stringify(items));
   }
 
   close() {

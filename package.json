@@ -19,6 +19,7 @@
     "autoprefixer": "^10.4.17",
     "dotenv": "^16.4.1",
     "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^5.1.91",
     "pinia": "^3.0.1",
     "postcss": "^8.4.35",
     "primeflex": "^3.3.1",

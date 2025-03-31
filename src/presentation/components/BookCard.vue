@@ -7,7 +7,10 @@
       'body.padding': 0,
     }"
   >
-    <template #content>
+    <template #content v-if="loadingRemove">
+      <BookCardSkeleton />
+    </template>
+    <template #content v-else>
       <img
         v-if="book.thumbnail"
         :src="book.thumbnail"
@@ -47,6 +50,7 @@
 import { useConfirm, useToast } from "primevue";
 import { computed, ref } from "vue";
 import { useBookStore } from "../stores/bookStore";
+import BookCardSkeleton from "./BookCardSkeleton.vue";
 const props = defineProps({
   book: {
     type: Object,
@@ -57,7 +61,7 @@ const props = defineProps({
 const confirm = useConfirm();
 const toast = useToast();
 const store = useBookStore();
-const { openBook, removeBook } = store;
+const { openBook, removeBook, loadingRemove } = store;
 
 const bookPercentageRead = computed(() => {
   return Math.round((props.book.currentPage / props.book.totalPages) * 100);
@@ -81,7 +85,7 @@ const toggle = (event) => {
 
 function remove() {
   confirm.require({
-    message: `Do you want to delete ${book.title}?`,
+    message: `Do you want to delete ${props.book.title}?`,
     header: "Danger Zone",
     icon: "pi pi-info-circle",
     rejectLabel: "Cancel",

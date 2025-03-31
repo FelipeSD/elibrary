@@ -38,6 +38,7 @@
           :page="currentPage"
           :width="500"
           @progress="onLoadingProgress"
+          :scale="3"
         />
 
         <div
@@ -77,9 +78,9 @@ const { closePDFViewer, showPDFViewer, currentBook } = store;
 
 const { debouncedCallback } = useDebounce();
 
-const currentPage = computed(() => currentBook.currentPage);
-const totalPages = computed(() => currentBook.totalPages);
-const pdfSource = computed(() => currentBook.filePath);
+const currentPage = ref(currentBook.currentPage);
+const totalPages = ref(currentBook.totalPages);
+const pdfSource = ref(currentBook.filePath);
 const loadingProgress = ref(0);
 
 watch(
@@ -87,7 +88,8 @@ watch(
   (newPage) => {
     debouncedCallback(() => {
       emit("onPageChange", newPage);
-    }, 750);
+      console.log("emitindo pagina mudada")
+    }, 1000);
   }
 );
 

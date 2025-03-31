@@ -1,54 +1,45 @@
-import { PDFDocument } from "pdf-lib";
-import { isElectron } from "../utils/environment";
+import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
+
+GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url
+).toString();
 
 export class ThumbnailService {
-  static async generateThumbnail(pdfBytes, maxWidth = 200) {
+  static async getThumbnail(pdfUrl, maxWidth = 200) {
     try {
-      const pdfDoc = await PDFDocument.load(pdfBytes);
-      const firstPage = pdfDoc.getPage(0);
+      // Carregar o PDF com o worker configurado
+      const pdf = await getDocument({ url: pdfUrl }).promise;
+      const page = await pdf.getPage(1);
 
-      // Calculate dimensions maintaining aspect ratio
-      const { width, height } = firstPage.getSize();
-      const aspectRatio = width / height;
-      const maxHeight = maxWidth / aspectRatio;
+      // Criar um canvas para renderizar a página
+      const scale = 1.5;
+      const viewport = page.getViewport({ scale });
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
 
-      // Create a new PDF with just the first page
-      const thumbnailDoc = await PDFDocument.create();
-      const [copiedPage] = await thumbnailDoc.copyPages(pdfDoc, [0]);
-      thumbnailDoc.addPage([maxWidth, maxHeight]);
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
 
-      // Draw the page scaled to fit
-      const thumbnailPage = thumbnailDoc.getPage(0);
-      thumbnailPage.drawPage(copiedPage, {
-        x: 0,
-        y: 0,
-        width: maxWidth,
-        height: maxHeight,
-      });
+      // Renderizar a página no canvas
+      await page.render({ canvasContext: context, viewport }).promise;
 
-      // Convert to base64
-      const thumbnailBytes = await thumbnailDoc.save();
-      const base64 = Buffer.from(thumbnailBytes).toString("base64");
-      return `data:application/pdf;base64,${base64}`;
+      // Redimensionar mantendo proporção
+      const aspectRatio = canvas.width / canvas.height;
+      const targetHeight = maxWidth / aspectRatio;
+
+      // Criar um segundo canvas para redimensionamento
+      const resizedCanvas = document.createElement("canvas");
+      resizedCanvas.width = maxWidth;
+      resizedCanvas.height = targetHeight;
+      const resizedContext = resizedCanvas.getContext("2d");
+
+      resizedContext.drawImage(canvas, 0, 0, maxWidth, targetHeight);
+
+      // Converter o canvas para base64 (PNG)
+      return resizedCanvas.toDataURL("image/webp");
     } catch (error) {
       console.error("Error generating thumbnail:", error);
-      return null;
-    }
-  }
-
-  static async getThumbnail(filePath) {
-    try {
-      if (isElectron()) {
-        const pdfBytes = await window.electronAPI.readFile(filePath);
-        return await this.generateThumbnail(pdfBytes);
-      } else {
-        // Na web, faça o fetch do arquivo
-        const response = await fetch(filePath);
-        const pdfBytes = await response.arrayBuffer();
-        return await this.generateThumbnail(pdfBytes);
-      }
-    } catch (error) {
-      console.error("Error getting thumbnail:", error);
       return null;
     }
   }

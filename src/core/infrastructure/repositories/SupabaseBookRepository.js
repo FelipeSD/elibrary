@@ -2,12 +2,11 @@ import { IBookRepository } from "../../domain/repositories/IBookRepository";
 import { Book } from "../../domain/entities/Book";
 import { SupabaseDatabaseService } from "../database/SupabaseDatabaseService";
 import { ThumbnailService } from "../../../services/thumbnailService";
-import supabaseClient from "../supabaseClient";
 
 export class SupabaseBookRepository extends IBookRepository {
   constructor() {
     super();
-    this.db = new SupabaseDatabaseService(supabaseClient);
+    this.db = new SupabaseDatabaseService();
   }
 
   async getAll() {
