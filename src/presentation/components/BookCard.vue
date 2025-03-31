@@ -1,6 +1,6 @@
 <template>
   <Card
-    v-tooltip="book.title"
+    v-tooltip.left="book.title"
     class="cursor-pointer relative"
     @click="emit('openBook', book)"
     :dt="{
@@ -25,6 +25,7 @@
           icon="pi pi-ellipsis-v"
           aria-label="Options"
           variant="text"
+          severity="contrast"
           size="small"
           rounded
           @click.stop="toggle"
@@ -33,7 +34,11 @@
         />
         <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
       </div>
-      <div class="absolute bottom-0 left-0 right-0"></div>
+      <div
+        class="absolute bottom-0 left-0 right-0 text-center dark:bg-slate-700 bg-slate-50 dark:text-white text-black"
+      >
+        {{ bookPercentageRead }}%
+      </div>
     </template>
   </Card>
 </template>
@@ -59,7 +64,9 @@ const items = ref([
   {
     label: "Remove",
     icon: "pi pi-trash",
-    action: () => {
+    command: () => {
+      console.log("removeBook");
+
       emit("removeBook", props.book.id);
     },
   },

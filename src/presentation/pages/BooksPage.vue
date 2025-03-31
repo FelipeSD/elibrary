@@ -7,19 +7,30 @@
     <div
       class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-9 gap-6"
     >
-      <template v-for="book in sortedBooks" :key="book.id">
-        <BookCard :book="book" @openBook="open" />
+      <template v-for="item in new Array(3)" :key="item">
+        <Skeleton class="w-full h-56" v-if="loading" />
       </template>
-    </div>
-
-    <div class="mt-8">
-      <Button
-        @click="addBook"
-        label="Add New Book"
-        icon="pi pi-plus"
-        severity="success"
-        :loading="loading"
-      />
+      <template v-for="book in sortedBooks" :key="book.id">
+        <BookCard :book="book" @openBook="open" @removeBook="remove" />
+      </template>
+      <Card
+        :pt="{
+          body: 'h-full h-56',
+          content: 'flex h-full items-center justify-center',
+        }"
+      >
+        <template #content>
+          <Button
+            icon="pi pi-plus"
+            rounded
+            variant="text"
+            aria-label="Add New Book"
+            v-tooltip="'Add New Book'"
+            severity="contrast"
+            @click="addBook"
+          />
+        </template>
+      </Card>
     </div>
 
     <PDFViewer
@@ -32,14 +43,16 @@
 </template>
 
 <script setup>
-import { useBookStore } from "../stores/bookStore";
 import { storeToRefs } from "pinia";
-import PDFViewer from "../components/PDFViewer.vue";
+import { useConfirm, useToast } from "primevue";
 import BookCard from "../components/BookCard.vue";
+import PDFViewer from "../components/PDFViewer.vue";
+import { useBookStore } from "../stores/bookStore";
 
 const store = useBookStore();
-const { addBook, openBook, removeBook, updateReadingProgress } = store;
-
+const confirm = useConfirm();
+const toast = useToast();
+const { addBook, openBook, updateReadingProgress, removeBook, getBookById } = store;
 const { loading, error, sortedBooks, showPDFViewer, currentBook } =
   storeToRefs(store);
 
@@ -51,5 +64,33 @@ async function onProgressSaved(currentPage) {
 
 function open(book) {
   openBook(book);
+}
+
+function remove(bookId) {
+  const book = getBookById(bookId)
+  confirm.require({
+    message: `Do you want to delete ${book.title}?`,
+    header: "Danger Zone",
+    icon: "pi pi-info-circle",
+    rejectLabel: "Cancel",
+    rejectProps: {
+      label: "Cancel",
+      severity: "secondary",
+      outlined: true,
+    },
+    acceptProps: {
+      label: "Delete",
+      severity: "danger",
+    },
+    accept: async () => {
+      await removeBook(bookId);
+      toast.add({
+        severity: "info",
+        summary: "Confirmed",
+        detail: "Record deleted",
+        life: 3000,
+      });
+    },
+  });
 }
 </script>

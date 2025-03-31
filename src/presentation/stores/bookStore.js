@@ -23,6 +23,10 @@ export const useBookStore = defineStore("books", () => {
     );
   });
 
+  function getBookById(bookId) {
+    return books.value.find((book) => book.id === bookId);
+  }
+
   async function loadBooks() {
     try {
       loading.value = true;
@@ -82,7 +86,6 @@ export const useBookStore = defineStore("books", () => {
       book.lastRead = new Date().toISOString();
 
       await repository.update(book);
-      // await repository.saveAll(books.value);
     } catch (err) {
       error.value = err.message;
     } finally {
@@ -123,5 +126,6 @@ export const useBookStore = defineStore("books", () => {
     closePDFViewer,
     updateReadingProgress,
     removeBook,
+    getBookById,
   };
 });

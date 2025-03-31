@@ -23,9 +23,6 @@ export class SupabaseStorageService {
       .from(BUCKET)
       .upload(fileName, file, { contentType: "application/pdf" });
 
-    console.log("Data:", data);
-    console.log("Error:", error);
-
     if (error) {
       console.error("Erro no upload:", error.message);
       return null;
@@ -36,7 +33,6 @@ export class SupabaseStorageService {
 
   async getPDFUrl(filePath) {
     const { data } = this.supabase.storage.from(BUCKET).getPublicUrl(filePath);
-    console.log(data);
     return data.publicUrl;
   }
 
