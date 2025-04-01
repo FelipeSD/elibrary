@@ -3,8 +3,9 @@
     v-tooltip.left="book.title"
     class="cursor-pointer relative"
     @click="openBook(book)"
-    :dt="{
-      'body.padding': 0,
+    :pt="{
+      body: 'p-0',
+      content: 'relative',
     }"
   >
     <template #content v-if="loadingRemove">
@@ -15,7 +16,7 @@
         v-if="book.thumbnail"
         :src="book.thumbnail"
         :alt="book.title"
-        class="w-full h-56 object-contain rounded-lg"
+        class="w-full h-56 object-fill rounded-lg"
       />
       <div
         v-else
@@ -23,12 +24,12 @@
       >
         <i class="pi pi-book text-4xl text-gray-400"></i>
       </div>
-      <div class="absolute right-0 top-0 p-2">
+      <div class="absolute right-0 bottom-0 p-1">
         <Button
           icon="pi pi-ellipsis-v"
           aria-label="Options"
           variant="text"
-          severity="contrast"
+          severity="secondary"
           size="small"
           rounded
           @click.stop="toggle"
@@ -37,11 +38,8 @@
         />
         <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
       </div>
-      <div
-        class="absolute bottom-0 left-0 right-0 text-center dark:bg-slate-700 bg-slate-50 dark:text-white text-black"
-      >
-        {{ bookPercentageRead }}%
-      </div>
+      <div class="badge" v-if="bookPercentageRead < 100">{{ bookPercentageRead }}%</div>
+      <RibbonBadge v-else>Read</RibbonBadge>
     </template>
   </Card>
 </template>
@@ -51,6 +49,7 @@ import { useConfirm, useToast } from "primevue";
 import { computed, ref } from "vue";
 import { useBookStore } from "../stores/bookStore";
 import BookCardSkeleton from "./BookCardSkeleton.vue";
+import RibbonBadge from "./RibbonBadge.vue";
 const props = defineProps({
   book: {
     type: Object,
@@ -110,3 +109,27 @@ function remove() {
   });
 }
 </script>
+
+<style>
+.badge {
+  position: absolute;
+  top: 0;
+  right: 10%;
+  font-size: 0.6rem;
+  padding: 0.3rem;
+  min-width: 30px;
+  text-align: center;
+  background: var(--p-neutral-800);
+}
+.badge::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 1.28rem;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background: var(--p-neutral-800);
+  clip-path: polygon(47% 50%, 0 0, 100% 0);
+}
+</style>

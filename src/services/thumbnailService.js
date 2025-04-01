@@ -1,5 +1,19 @@
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 
+if (typeof window !== "undefined" && window.URL) {
+  // Patch para o método problemático
+  if (!window.URL.parse) {
+    window.URL.parse = function (url, base) {
+      try {
+        return new URL(url, base);
+      } catch (e) {
+        console.warn("URL parse error:", e);
+        return null;
+      }
+    };
+  }
+}
+
 GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
   import.meta.url
@@ -9,11 +23,12 @@ export class ThumbnailService {
   static async getThumbnail(pdfUrl, maxWidth = 200) {
     try {
       // Carregar o PDF com o worker configurado
-      const pdf = await getDocument({ url: pdfUrl }).promise;
+      const scale = 3;
+
+      const pdf = await getDocument({ url: pdfUrl }, { scale }).promise;
       const page = await pdf.getPage(1);
 
       // Criar um canvas para renderizar a página
-      const scale = 1.5;
       const viewport = page.getViewport({ scale });
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d");

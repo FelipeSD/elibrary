@@ -11,9 +11,9 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
-    // electron({
-    //   entry: "electron/main.cjs",
-    // }),
+    electron({
+      entry: "electron/main.cjs",
+    }),
   ],
   base: "./",
   resolve: {

@@ -15,9 +15,8 @@
         <Button
           @click="closePDFViewer"
           icon="pi pi-times"
-          text
           rounded
-          severity="contrast"
+          severity="secondary"
           size="small"
         />
       </div>
@@ -66,7 +65,7 @@
 import Dialog from "primevue/dialog";
 import Knob from "primevue/knob";
 import Slider from "primevue/slider";
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import VuePdfEmbed from "vue-pdf-embed";
 import { useDebounce } from "../composables/useDebounce";
 import { useBookStore } from "../stores/bookStore";
@@ -88,8 +87,7 @@ watch(
   (newPage) => {
     debouncedCallback(() => {
       emit("onPageChange", newPage);
-      console.log("emitindo pagina mudada")
-    }, 1000);
+    });
   }
 );
 
@@ -108,6 +106,6 @@ const onLoadingProgress = (progress) => {
 
 canvas {
   width: 100% !important;
-  height: calc(100vh - 5rem) !important;
+  max-height: calc(100vh - 5rem) !important;
 }
 </style>

@@ -4,7 +4,7 @@
   </div>
 
   <div
-    class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-9 gap-6"
+    class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-9 gap-6"
   >
     <template v-for="book in sortedBooks" :key="book.id">
       <BookCard :book="book" />
@@ -12,7 +12,7 @@
     <BookCardSkeleton v-if="loading" />
     <Card
       :pt="{
-        body: 'h-full h-56',
+        body: 'h-56',
         content: 'flex h-full items-center justify-center',
       }"
     >
