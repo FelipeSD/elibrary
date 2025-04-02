@@ -1,7 +1,6 @@
-import { IBookRepository } from "../../domain/repositories/IBookRepository";
 import { Book } from "../../domain/entities/Book";
+import { IBookRepository } from "../../domain/repositories/IBookRepository";
 import { SupabaseDatabaseService } from "../database/SupabaseDatabaseService";
-import { ThumbnailService } from "../../../services/thumbnailService";
 
 export class SupabaseBookRepository extends IBookRepository {
   constructor() {
@@ -21,14 +20,6 @@ export class SupabaseBookRepository extends IBookRepository {
 
   async save(book) {
     const bookData = book.toJSON();
-
-    // Gerar thumbnail se não existir
-    if (!bookData.thumbnail) {
-      bookData.thumbnail = await ThumbnailService.getThumbnail(
-        bookData.filePath
-      );
-    }
-
     const mappedData = this.mapEntityToDatabase(bookData);
     const savedBook = await this.db.save("books", mappedData);
     return Book.fromJSON(this.mapDatabaseToEntity(savedBook));
@@ -36,14 +27,6 @@ export class SupabaseBookRepository extends IBookRepository {
 
   async update(book) {
     const bookData = book.toJSON();
-
-    // Gerar thumbnail se não existir
-    if (!bookData.thumbnail) {
-      bookData.thumbnail = await ThumbnailService.getThumbnail(
-        bookData.filePath
-      );
-    }
-
     const mappedData = this.mapEntityToDatabase(bookData);
     const updatedBook = await this.db.update("books", bookData.id, mappedData);
     return Book.fromJSON(this.mapDatabaseToEntity(updatedBook));

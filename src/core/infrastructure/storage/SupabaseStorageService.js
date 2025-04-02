@@ -29,7 +29,7 @@ export class SupabaseStorageService {
     return data.path;
   }
 
-  async getPDFUrl(filePath) {
+  getPDFUrl(filePath) {
     const { data } = this.supabase.storage.from(BUCKET).getPublicUrl(filePath);
     return data.publicUrl;
   }

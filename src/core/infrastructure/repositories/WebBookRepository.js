@@ -1,7 +1,6 @@
-import { IBookRepository } from "../../domain/repositories/IBookRepository";
 import { Book } from "../../domain/entities/Book";
+import { IBookRepository } from "../../domain/repositories/IBookRepository";
 import { WebDatabaseService } from "../database/WebDatabaseService";
-import { ThumbnailService } from "../../../services/thumbnailService";
 
 export class WebBookRepository extends IBookRepository {
   constructor() {
@@ -21,28 +20,12 @@ export class WebBookRepository extends IBookRepository {
 
   async save(book) {
     const bookData = book.toJSON();
-
-    // Gerar thumbnail se não existir
-    if (!bookData.thumbnail) {
-      bookData.thumbnail = await ThumbnailService.getThumbnail(
-        bookData.filePath
-      );
-    }
-
     this.db.save(bookData);
     return book;
   }
 
   async update(book) {
     const bookData = book.toJSON();
-
-    // Gerar thumbnail se não existir
-    if (!bookData.thumbnail) {
-      bookData.thumbnail = await ThumbnailService.getThumbnail(
-        bookData.filePath
-      );
-    }
-
     this.db.save(bookData);
     return book;
   }

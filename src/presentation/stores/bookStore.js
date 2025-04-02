@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
-import { ref, computed, onMounted } from "vue";
-import { AddBookUseCase } from "../../core/useCases/book/AddBookUseCase";
-import { SupabaseBookRepository } from "../../core/infrastructure/repositories/SupabaseBookRepository";
-import { PDFService } from "../../services/pdfService";
-import { SupabaseStorageService } from "../../core/infrastructure/storage/SupabaseStorageService";
+import { computed, onMounted, ref } from "vue";
+import { SupabaseBookRepository } from "@/core/infrastructure/repositories/SupabaseBookRepository";
+import { SupabaseStorageService } from "@/core/infrastructure/storage/SupabaseStorageService";
+import { AddBookUseCase } from "@/core/useCases/book/AddBookUseCase";
+import { FileSelectorService } from "@/services/fileSelectorService";
 
 export const useBookStore = defineStore("books", () => {
   const books = ref([]);
@@ -39,14 +39,9 @@ export const useBookStore = defineStore("books", () => {
   async function addBook() {
     try {
       error.value = null;
-
-      const book = await PDFService.selectPDF();
-      console.log(book);
-      if (!book) {
-        throw new Error("Error adding book");
-      }
       loading.value = true;
-      const savedBook = await addBookUseCase.execute(book);
+      const selectedFile = await FileSelectorService.selectFile();
+      const savedBook = await addBookUseCase.execute(selectedFile);
       books.value.push(savedBook);
     } catch (err) {
       console.error(err);
@@ -123,6 +118,6 @@ export const useBookStore = defineStore("books", () => {
     openBook,
     closePDFViewer,
     updateReadingProgress,
-    removeBook
+    removeBook,
   };
 });

@@ -29,7 +29,8 @@
           icon="pi pi-ellipsis-v"
           aria-label="Options"
           variant="text"
-          severity="secondary"
+          severity="contrast"
+          class="text-black hover:text-white"
           size="small"
           rounded
           @click.stop="toggle"
