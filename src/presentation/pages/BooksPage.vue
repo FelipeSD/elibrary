@@ -31,7 +31,7 @@
     </Card>
   </div>
 
-  <PDFViewer v-if="currentBook" @onPageChange="saveProgress" />
+  <PDFViewer v-if="currentBook" @onReadBookPage="saveProgress" />
 </template>
 
 <script setup>

@@ -13,16 +13,14 @@
     <div class="pdf-container">
       <div class="absolute p-2 right-0 z-10">
         <Button
-          @click="closePDFViewer"
+          @click="close"
           icon="pi pi-times"
           rounded
           severity="secondary"
           size="small"
         />
       </div>
-      <div
-        class="flex w-full h-full flex-col items-center justify-center relative"
-      >
+      <div class="flex w-full h-full flex-col items-center justify-center">
         <div v-if="loadingProgress < 100">
           <Knob
             v-model="loadingProgress"
@@ -40,21 +38,31 @@
           :scale="3"
         />
 
-        <div
-          class="absolute bottom-0 flex w-full items-center justify-center mt-4 gap-4"
-          v-if="loadingProgress === 100"
-        >
-          <Slider
-            v-if="totalPages"
-            v-model="currentPage"
-            :min="1"
-            :max="totalPages"
-            :step="1"
-            class="w-1/2 mt-4"
-          />
-          <div class="ml-2 mt-4 text-sm text-gray-500">
-            Page {{ currentPage }} of {{ totalPages }}
-          </div>
+        <div class="absolute right-0 top-1/2 -translate-y-1/2">
+          <PDFControlBox>
+            <div class="flex flex-col items-center">
+              <Input v-model.number="currentPage" class="max-w-10 mb-2" />
+              <span class="mb-4">
+                {{ totalPages }}
+              </span>
+              <Button
+                icon="pi pi-chevron-up"
+                size="small"
+                rounded
+                text
+                :disabled="currentPage === 1"
+                @click="currentPage--"
+              />
+              <Button
+                icon="pi pi-chevron-down"
+                size="small"
+                rounded
+                text
+                :disabled="currentPage === totalPages"
+                @click="currentPage++"
+              />
+            </div>
+          </PDFControlBox>
         </div>
       </div>
     </div>
@@ -64,13 +72,13 @@
 <script setup>
 import Dialog from "primevue/dialog";
 import Knob from "primevue/knob";
-import Slider from "primevue/slider";
 import { ref, watch } from "vue";
 import VuePdfEmbed from "vue-pdf-embed";
 import { useDebounce } from "../composables/useDebounce";
 import { useBookStore } from "../stores/bookStore";
+import PDFControlBox from "./PDFControlBox.vue";
 
-const emit = defineEmits(["onPageChange"]);
+const emit = defineEmits(["onReadBookPage"]);
 
 const store = useBookStore();
 const { closePDFViewer, showPDFViewer, currentBook } = store;
@@ -86,7 +94,7 @@ watch(
   () => currentPage.value,
   (newPage) => {
     debouncedCallback(() => {
-      emit("onPageChange", newPage);
+      emit("onReadBookPage", newPage);
     });
   }
 );
@@ -96,6 +104,11 @@ const onLoadingProgress = (progress) => {
     ((progress.loaded / progress.total) * 100).toFixed(0)
   );
 };
+
+function close() {
+  emit("onReadBookPage", currentPage.value);
+  closePDFViewer();
+}
 </script>
 
 <style>

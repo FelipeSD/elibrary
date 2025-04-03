@@ -10,6 +10,7 @@ export const useBookStore = defineStore("books", () => {
   const currentBook = ref(null);
   const loading = ref(false);
   const loadingRemove = ref(false);
+  const loadingUpdate = ref(false);
   const error = ref(null);
   const showPDFViewer = ref(false);
 
@@ -19,8 +20,12 @@ export const useBookStore = defineStore("books", () => {
   const addBookUseCase = new AddBookUseCase(repository);
 
   const sortedBooks = computed(() => {
+    console.log("alterar posição")
     return [...books.value].sort(
-      (a, b) => new Date(b.lastRead) - new Date(a.lastRead)
+      (a, b) => {
+        console.log(b, a)
+        return new Date(b.lastRead) - new Date(a.lastRead)
+      }
     );
   });
 
@@ -69,11 +74,12 @@ export const useBookStore = defineStore("books", () => {
     currentBook.value = null;
   }
 
-  async function updateReadingProgress(book, currentPage) {
+  async function updateReadingProgress(currentBook, currentPage) {
     try {
-      loading.value = true;
+      loadingUpdate.value = true;
       error.value = null;
 
+      const book = books.value.find(b => b.id === currentBook.id)
       book.currentPage = currentPage;
       book.lastRead = new Date().toISOString();
 
@@ -81,7 +87,7 @@ export const useBookStore = defineStore("books", () => {
     } catch (err) {
       error.value = err.message;
     } finally {
-      loading.value = false;
+      loadingUpdate.value = false;
     }
   }
 
@@ -110,6 +116,7 @@ export const useBookStore = defineStore("books", () => {
     currentBook,
     loading,
     loadingRemove,
+    loadingUpdate,
     error,
     sortedBooks,
     showPDFViewer,

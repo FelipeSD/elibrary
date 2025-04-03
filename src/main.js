@@ -10,6 +10,7 @@ import "./assets/main.css";
 
 // PrimeVue components
 import Button from "primevue/button";
+import Input from "primevue/inputtext";
 import Tooltip from "primevue/tooltip";
 import Card from "primevue/card";
 import Menu from "primevue/menu";
@@ -31,6 +32,7 @@ app.use(ConfirmationService);
 app.use(ToastService);
 
 // Register PrimeVue components
+app.component("Input", Input);
 app.component("Button", Button);
 app.component("Card", Card);
 app.component("Menu", Menu);
