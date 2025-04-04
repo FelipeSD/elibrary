@@ -11,9 +11,9 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
-    // electron({
-    //   entry: "electron/main.cjs",
-    // }),
+    electron({
+      entry: "electron/main.cjs",
+    }),
   ],
   base: "./",
   resolve: {
@@ -35,7 +35,6 @@ export default defineConfig({
     exclude: ["@electron/remote"],
   },
   define: {
-    "process.env.NODE_ENV": '"development"',
     "process.env": process.env,
   },
 });
